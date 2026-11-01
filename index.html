@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>M O Trader's POS</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<style>
+:root{--navy:#102a43;--blue:#1769aa;--sky:#eaf4ff;--gold:#e5b94d;--ink:#172b4d;--muted:#62748a;--line:#dce5ef;--bg:#f4f7fb;--white:#fff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--ink)}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;border-radius:8px;padding:10px 14px;background:var(--blue);color:white;font-weight:700}button.secondary{background:#e7eef7;color:var(--ink)}button.danger{background:#b42318}.app{display:grid;grid-template-columns:235px 1fr;min-height:100vh}.side{background:var(--navy);color:white;padding:24px 15px}.brand{font-size:20px;font-weight:800;line-height:1.3;margin:0 10px 5px}.brand small{display:block;color:#bcd7f2;font-size:11px;letter-spacing:1px;margin-top:7px}.nav{margin-top:28px;display:grid;gap:7px}.nav button{background:transparent;color:#dbe8f5;text-align:left;font-weight:600}.nav button.active,.nav button:hover{background:#234968;color:white}.sidefoot{font-size:11px;color:#bcd0e2;line-height:1.6;margin:35px 10px}.main{padding:24px;min-width:0}.top{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:22px}.top h1{margin:0;font-size:25px}.sub{color:var(--muted);font-size:13px;margin-top:5px}.status{font-size:12px;padding:8px 12px;border-radius:99px;background:#e0f5e9;color:#17633a;font-weight:700}.cards{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:14px;margin-bottom:20px}.card,.panel{background:white;border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 3px 12px #183b5b08}.card label{color:var(--muted);font-size:12px}.card strong{display:block;font-size:24px;margin-top:9px}.panel{margin-bottom:18px}.panel h2{font-size:17px;margin:0 0 15px}.section{display:none}.section.active{display:block}.grid2{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field{display:grid;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:12px;color:var(--muted);font-weight:700}.field input,.field select,.field textarea{width:100%;padding:10px;border:1px solid #cbd7e4;border-radius:8px;background:white;color:var(--ink)}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.tablewrap{overflow:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{text-align:left;padding:11px 9px;border-bottom:1px solid var(--line);white-space:nowrap}th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px;background:#f8fafc}td input{width:85px;padding:7px;border:1px solid var(--line);border-radius:6px}.empty{color:var(--muted);padding:20px;text-align:center}.totalbox{background:var(--sky);padding:14px;border-radius:10px;display:grid;gap:8px;margin-top:12px}.totalrow{display:flex;justify-content:space-between;gap:10px}.totalrow.final{font-size:20px;font-weight:800;border-top:1px solid #c7dced;padding-top:9px}.muted{color:var(--muted)}.small{font-size:12px}.pill{display:inline-block;background:#edf4fb;padding:4px 8px;border-radius:99px;font-size:11px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.toolbar input{flex:1;min-width:180px;padding:10px;border:1px solid var(--line);border-radius:8px}.notice{background:#fff7df;border:1px solid #f1d98a;border-radius:10px;padding:12px;font-size:12px;line-height:1.5;margin-bottom:18px}.hidden{display:none!important}
+@media(max-width:850px){.app{grid-template-columns:1fr}.side{padding:15px}.nav{grid-template-columns:repeat(3,1fr);margin-top:15px}.nav button{text-align:center;font-size:12px;padding:9px 5px}.sidefoot{display:none}.main{padding:14px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:1fr}}
+@media print{body{background:white}.side,.top,.no-print,.notice{display:none!important}.app{display:block}.main{padding:0}.section{display:none!important}#invoicePrint{display:block!important}.panel{border:0;box-shadow:none;padding:0}.invoice-copy{height:140mm;overflow:hidden;padding:4mm 7mm;position:relative}.invoice-copy:first-child{border-bottom:1px dashed #777}.copy-label{text-align:right;font-weight:700;font-size:10px;letter-spacing:1px;margin-bottom:2mm}.printhead{text-align:center;border-bottom:1px solid #222;padding-bottom:3mm;margin-bottom:3mm}.invoice-logo{display:block;width:42mm;height:auto;margin:0 auto 2mm}.printhead h2{font-size:15px;margin:3px 0}.printmeta{display:flex;justify-content:space-between;margin:3mm 0;font-size:11px}.printtotals{width:70mm;margin-left:auto;margin-top:3mm;font-size:11px}.printtotals div{display:flex;justify-content:space-between;padding:2px}.signature{display:flex;justify-content:space-between;margin-top:8mm;font-size:10px}.printnote{margin-top:4mm;font-size:10px}#printContent table{font-size:11px}#printContent th,#printContent td{padding:5px 6px}}
+@page{size:A4 portrait;margin:8mm}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+  <div class="brand">M O TRADER'S<small>ADVERTISEMENT SOLUTION</small></div>
+  <div class="nav">
+    <button class="active" data-tab="dashboard">▦ Dashboard</button>
+    <button data-tab="sales">＋ New Sale / Bill</button>
+    <button data-tab="purchases">▣ Purchases</button>
+    <button data-tab="expenses">↗ Expenses</button>
+    <button data-tab="settings">⚙ Settings / Backup</button>
+  </div>
+  <div class="sidefoot">PKR • A4 Print Ready<br>Offline-first local demo</div>
+</aside>
+<main class="main">
+  <div class="top"><div><h1 id="pageTitle">Dashboard</h1><div class="sub">Sales, purchases, expenses and customer balances</div></div><span class="status" id="connection">● Offline-ready • Local data</span></div>
+  <div class="notice"><b>Firebase sync:</b> Sign in to sync sales, purchases, expenses and settings across devices. Configure Firebase in the app code first. Export backups regularly; avoid editing from multiple devices while offline.</div>
+
+  <section id="dashboard" class="section active">
+    <div class="panel no-print"><h2>Dashboard Date Filter</h2><div class="formgrid">
+      <div class="field"><label>From</label><input id="dashFrom" type="date" onchange="renderDashboard()"></div>
+      <div class="field"><label>To</label><input id="dashTo" type="date" onchange="renderDashboard()"></div>
+      <div class="field"><label>Invoice List</label><select id="invoiceFilter" onchange="renderDashboard()"><option value="sales">Sale Invoices</option><option value="purchases">Purchase Invoices</option></select></div>
+    </div><div class="actions"><button class="secondary" onclick="clearDashboardDates()">Show All Dates</button></div></div>
+    <div class="cards">
+      <div class="card"><label>Sales</label><strong id="dashSales">Rs. 0</strong></div>
+      <div class="card"><label>Purchases (Raw Material)</label><strong id="dashPurchases">Rs. 0</strong></div>
+      <div class="card"><label>Expenses</label><strong id="dashExpenses">Rs. 0</strong></div>
+      <div class="card"><label>Estimated Net Profit</label><strong id="dashNetProfit">Rs. 0</strong></div>
+      <div class="card"><label>Customer Balance Due (All Time)</label><strong id="balanceDue">Rs. 0</strong></div>
+    </div>
+    <p class="small muted">Net profit is estimated gross profit on sales minus non-purchase expenses. Raw Material purchases are shown separately to avoid counting product cost twice.</p>
+    <div class="panel" id="salesInvoicePanel"><h2>Sale Invoices</h2><div id="salesInvoices" class="tablewrap"></div></div>
+    <div class="panel hidden" id="purchaseInvoicePanel"><h2>Purchase Invoices</h2><div id="purchaseInvoices" class="tablewrap"></div></div>
+  </section>
+
+  <section id="sales" class="section">
+    <div class="grid2">
+      <div class="panel">
+        <h2>Create Sale / Invoice</h2>
+        <div class="formgrid">
+          <div class="field"><label>Invoice No.</label><input id="invoiceNo" readonly></div>
+          <div class="field"><label>Date</label><input id="saleDate" type="date"></div>
+          <div class="field"><label>Customer Name</label><input id="customer" placeholder="Customer name"></div>
+          <div class="field"><label>Phone</label><input id="customerPhone" placeholder="03xx xxxxxxx"></div>
+          <div class="field full"><label>Product / Service</label><input id="saleProduct" placeholder="e.g. Neon Name Sign"></div>
+          <div class="field"><label>Quantity</label><input id="saleQty" type="number" min="1" value="1"></div>
+          <div class="field"><label>Unit Sale Price (Rs.)</label><input id="salePrice" type="number" min="0" value="0"></div>
+          <div class="field"><label>Unit Cost (Rs.)</label><input id="saleCost" type="number" min="0" value="0"></div>
+          <div class="field"><label>Discount (Rs.)</label><input id="saleDiscount" type="number" min="0" value="0"></div>
+          <div class="field"><label>Advance / Paid (Rs.)</label><input id="salePaid" type="number" min="0" value="0"></div>
+          <div class="field"><label>Payment Method</label><select id="paymentMethod"><option>Cash</option><option>Bank Transfer</option><option>JazzCash / Easypaisa</option><option>Credit</option></select></div>
+          <div class="field full"><label>Notes</label><input id="saleNotes" placeholder="Design, size, colour or other details"></div>
+        </div>
+        <div class="totalbox"><div class="totalrow"><span>Subtotal</span><b id="saleSubtotal">Rs. 0</b></div><div class="totalrow"><span>Grand Total</span><b id="saleGrand">Rs. 0</b></div><div class="totalrow"><span>Remaining Balance</span><b id="saleBalance">Rs. 0</b></div><div class="totalrow"><span>Estimated Gross Profit</span><b id="saleProfit">Rs. 0</b></div></div>
+        <div class="actions no-print"><button onclick="saveSale()">Save Sale & Prepare Bill</button><button class="secondary" onclick="resetSale()">Clear</button></div>
+      </div>
+      <div class="panel"><h2>Invoice Preview</h2><p class="muted small">Save the sale, then print on A4 paper. In the print dialog choose your printer and paper size A4.</p><div id="invoicePreview" class="empty">Your invoice preview will appear here after saving a sale.</div></div>
+    </div>
+  </section>
+
+  <section id="purchases" class="section">
+    <div class="panel"><h2>Add Purchase</h2><div class="formgrid">
+      <div class="field"><label>Date</label><input id="purchaseDate" type="date"></div>
+      <div class="field"><label>Supplier Name</label><input id="purchaseSupplier" placeholder="Supplier name"></div>
+      <div class="field"><label>Item / Raw Material</label><input id="purchaseItem" placeholder="e.g. Acrylic sheet, LED strip"></div>
+      <div class="field"><label>Quantity</label><input id="purchaseQty" type="number" min="0.01" step="any" value="1"></div>
+      <div class="field"><label>Unit Cost (Rs.)</label><input id="purchasePrice" type="number" min="0" step="any" value="0"></div>
+      <div class="field"><label>Payment Method</label><select id="purchaseMethod"><option>Cash</option><option>Bank Transfer</option><option>JazzCash / Easypaisa</option><option>Credit</option></select></div>
+      <div class="field full"><label>Reference / Notes</label><input id="purchaseNote" placeholder="Optional details"></div>
+    </div><div class="totalbox"><div class="totalrow final"><span>Purchase Total</span><b id="purchaseTotal">Rs. 0</b></div></div><div class="actions"><button onclick="savePurchase()">Save Purchase</button><button class="secondary" onclick="resetPurchase()">Clear</button></div></div>
+    <div class="panel"><h2>Purchase History</h2><div id="purchasesTable" class="tablewrap"></div></div>
+  </section>
+
+  <section id="expenses" class="section">
+    <div class="panel"><h2>Add Business Expense</h2><div class="formgrid">
+      <div class="field"><label>Date</label><input id="expDate" type="date"></div><div class="field"><label>Expense Type</label><select id="expType"><option>Shop Rent</option><option>Electricity</option><option>Transport</option><option>Salary / Labour</option><option>Repair / Maintenance</option><option>Other</option></select></div>
+      <div class="field"><label>Amount (Rs.)</label><input id="expAmount" type="number" min="0" value="0"></div><div class="field"><label>Paid To / Reference</label><input id="expNote" placeholder="Optional"></div>
+    </div><div class="actions"><button onclick="saveExpense()">Save Expense</button></div></div>
+    <div class="panel"><h2>Expense History</h2><div id="expensesTable" class="tablewrap"></div></div>
+  </section>
+
+  <section id="settings" class="section">
+    <div class="panel"><h2>Firebase Cloud Sync</h2><p class="muted small">Sign in with an account created for your staff in Firebase Authentication. Do not share login credentials.</p><div class="formgrid"><div class="field"><label>Email</label><input id="authEmail" type="email" autocomplete="username" placeholder="Staff email"></div><div class="field"><label>Password</label><input id="authPassword" type="password" autocomplete="current-password" placeholder="Password"></div></div><div class="actions"><button onclick="signInToFirebase()">Sign In & Sync</button><button class="secondary" onclick="signOutFirebase()">Sign Out</button></div><p id="firebaseMessage" class="small muted">Add your Firebase web config in index.html to enable cloud sync.</p></div>
+    <div class="panel"><h2>Shop & Invoice Settings</h2><div class="formgrid">
+      <div class="field"><label>Business Name</label><input id="setName" value="M O Trader's Advertisement Solution"></div><div class="field"><label>Phone</label><input id="setPhone" value="03392727820"></div>
+      <div class="field full"><label>Shop Address</label><input id="setAddress" value="Shop no UG 154, Ruby Cinema Shopping Mall, Saeedabad, Baldia Town, Karachi"></div><div class="field"><label>Invoice Footer</label><input id="setFooter" value="Advance must for customised products. Thank you for your business!"></div>
+    </div><div class="actions"><button onclick="saveSettings()">Save Settings</button></div></div>
+    <div class="panel"><h2>Backup & Restore</h2><p class="muted small">Export a JSON backup to keep a copy of your records. Restore replaces current data locally and in Firebase when signed in, so export first if needed.</p><div class="actions"><button onclick="backupData()">Export Full Backup</button><label class="secondary" style="padding:10px 14px;border-radius:8px;cursor:pointer;font-weight:700">Restore Backup <input type="file" accept=".json,application/json" style="display:none" onchange="restoreData(event)"></label><button class="secondary" onclick="window.print()">Print Current Page</button><button class="danger" onclick="clearAll()">Clear All Data</button></div><p class="small muted">Keep backups in a safe place. Firebase sync uses one shared Firestore document; keep the dataset small and use trusted staff accounts only.</p></div>
+  </section>
+  <section id="invoicePrint" class="section"><div id="printContent"></div></section>
+</main></div>
+<script>
+const KEY='mo_traders_pos_v1';
+const FIREBASE_CONFIG={apiKey:'YOUR_API_KEY',authDomain:'YOUR_PROJECT_ID.firebaseapp.com',projectId:'YOUR_PROJECT_ID',storageBucket:'YOUR_PROJECT_ID.appspot.com',messagingSenderId:'YOUR_MESSAGING_SENDER_ID',appId:'YOUR_APP_ID'};
+let db={sales:[],orders:[],purchases:[],expenses:[],settings:{name:"M O Trader's Advertisement Solution",phone:"03392727820",address:"Shop no UG 154, Ruby Cinema Shopping Mall, Saeedabad, Baldia Town, Karachi",footer:"Advance must for customised products. Thank you for your business!"}};
+let cloudDoc=null,cloudReady=false,stopCloudListener=null;
+const $=id=>document.getElementById(id);
+const money=n=>'Rs. '+(Number(n)||0).toLocaleString('en-PK',{maximumFractionDigits:2});
+const today=()=>new Date().toISOString().slice(0,10);
+function load(){try{let x=JSON.parse(localStorage.getItem(KEY));if(x){db={...db,...x,settings:{...db.settings,...x.settings}};db.purchases=db.purchases||[];delete db.inventory}}catch(e){}}
+function persist(){localStorage.setItem(KEY,JSON.stringify(db));renderAll();if(cloudReady&&cloudDoc)cloudDoc.set(db).then(()=>setSyncStatus('● Firebase synced','Cloud sync is up to date.')).catch(e=>setSyncStatus('● Sync error',`Cloud save failed: ${e.message}`))}
+function setSyncStatus(label,message){$('connection').textContent=label;if(message)$('firebaseMessage').textContent=message}
+function initializeFirebase(){const configured=FIREBASE_CONFIG.apiKey!=='YOUR_API_KEY'&&FIREBASE_CONFIG.projectId!=='YOUR_PROJECT_ID'&&FIREBASE_CONFIG.appId!=='YOUR_APP_ID';if(!configured){setSyncStatus('● Local only','Paste your Firebase web app config into FIREBASE_CONFIG in index.html to enable cloud sync.');return}try{firebase.initializeApp(FIREBASE_CONFIG);firebase.auth().onAuthStateChanged(user=>{if(stopCloudListener){stopCloudListener();stopCloudListener=null}cloudReady=false;if(!user){setSyncStatus('● Firebase • Signed out','Firebase is configured. Sign in to sync data across devices.');return}cloudDoc=firebase.firestore().doc('posData/main');stopCloudListener=cloudDoc.onSnapshot(snapshot=>{if(snapshot.exists){db={...db,...snapshot.data(),settings:{...db.settings,...snapshot.data().settings}};db.purchases=db.purchases||[];delete db.inventory;localStorage.setItem(KEY,JSON.stringify(db));renderAll()}else{cloudDoc.set(db).then(()=>{cloudReady=true;setSyncStatus('● Firebase synced','Local records uploaded to the new Firebase database.')}).catch(e=>setSyncStatus('● Sync error',`Firebase setup error: ${e.message}`));return}cloudReady=true;setSyncStatus('● Firebase synced','Cloud sync is up to date.')},e=>setSyncStatus('● Sync error',`Firebase read failed: ${e.message}`))})}catch(e){setSyncStatus('● Firebase error',`Firebase initialization failed: ${e.message}`)}}
+function signInToFirebase(){if(typeof firebase==='undefined'||!firebase.apps.length)return alert('Add the Firebase web config in index.html first.');let email=$('authEmail').value.trim(),password=$('authPassword').value;if(!email||!password)return alert('Enter your Firebase account email and password.');firebase.auth().signInWithEmailAndPassword(email,password).catch(e=>setSyncStatus('● Sign-in failed',e.message))}
+function signOutFirebase(){if(typeof firebase!=='undefined'&&firebase.apps.length)firebase.auth().signOut()}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function showTab(tab){document.querySelectorAll('.section').forEach(x=>x.classList.toggle('active',x.id===tab));document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));$('pageTitle').textContent=({dashboard:'Dashboard',sales:'New Sale / Bill',purchases:'Purchases',expenses:'Expenses',records:'Records & Reports',settings:'Settings / Backup'}[tab]||tab);if(tab==='sales'){$('invoiceNo').value=nextInvoice();calcSale()}}
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+function nextInvoice(){return 'MO-'+String(Date.now()).slice(-8)}
+function calcSale(){let q=+$('saleQty').value||0,price=+$('salePrice').value||0,cost=+$('saleCost').value||0,disc=+$('saleDiscount').value||0,paid=+$('salePaid').value||0,sub=q*price,total=Math.max(0,sub-disc);$('saleSubtotal').textContent=money(sub);$('saleGrand').textContent=money(total);$('saleBalance').textContent=money(Math.max(0,total-paid));$('saleProfit').textContent=money(total-q*cost)}
+['saleQty','salePrice','saleCost','saleDiscount','salePaid'].forEach(id=>$(id).addEventListener('input',calcSale));
+function resetSale(){['customer','customerPhone','saleProduct','saleNotes'].forEach(id=>$(id).value='');$('saleQty').value=1;$('salePrice').value=0;$('saleCost').value=0;$('saleDiscount').value=0;$('salePaid').value=0;$('saleDate').value=today();$('invoiceNo').value=nextInvoice();calcSale()}
+function saveSale(){let product=$('saleProduct').value.trim();if(!product)return alert('Please enter product or service.');let qty=+$('saleQty').value||0,price=+$('salePrice').value||0,cost=+$('saleCost').value||0,discount=+$('saleDiscount').value||0,paid=+$('salePaid').value||0,total=Math.max(0,qty*price-discount);if(qty<=0||total<0)return alert('Check quantity and price.');if(paid>total&&!confirm('Paid amount is greater than bill total. Save anyway?'))return;let sale={id:Date.now(),invoice:$('invoiceNo').value||nextInvoice(),date:$('saleDate').value||today(),customer:$('customer').value.trim()||'Walk-in Customer',phone:$('customerPhone').value.trim(),product,qty,price,cost,discount,total,paid,balance:Math.max(0,total-paid),method:$('paymentMethod').value,notes:$('saleNotes').value.trim(),profit:total-qty*cost};db.sales.unshift(sale);persist();makeInvoice(sale);$('invoicePreview').innerHTML=`<b>${esc(sale.invoice)}</b><p>${esc(sale.customer)} · ${money(sale.total)}</p><button onclick="printInvoice(${sale.id})">Print A4 Invoice</button>`;alert('Sale saved. You can now print the A4 invoice.');}
+function makeInvoice(s){let st=db.settings;let copy=`<div class="printhead"><img class="invoice-logo" src="logo.svg" alt="M O Trader's Advertisement Solution logo"><div>${esc(st.address)}</div><div>Phone: ${esc(st.phone)}</div><h2>SALES INVOICE</h2></div><div class="printmeta"><div><b>Invoice:</b> ${esc(s.invoice)}<br><b>Date:</b> ${esc(s.date)}</div><div><b>Customer:</b> ${esc(s.customer)}<br><b>Phone:</b> ${esc(s.phone||'—')}</div></div><table><thead><tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Discount</th><th>Amount</th></tr></thead><tbody><tr><td>${esc(s.product)}<br><span class="small">${esc(s.notes||'')}</span></td><td>${s.qty}</td><td>${money(s.price)}</td><td>${money(s.discount)}</td><td>${money(s.total)}</td></tr></tbody></table><div class="printtotals"><div><span>Subtotal</span><b>${money(s.qty*s.price)}</b></div><div><span>Discount</span><b>${money(s.discount)}</b></div><div><span>Grand Total</span><b>${money(s.total)}</b></div><div><span>Paid / Advance</span><b>${money(s.paid)}</b></div><div><span>Balance Due</span><b>${money(s.balance)}</b></div><div><span>Payment Method</span><b>${esc(s.method)}</b></div></div><div class="printnote">${esc(st.footer)}</div><div class="signature"><span>Customer Signature: __________________</span><span>Authorized Signature / Stamp: __________________</span></div>`;$('printContent').innerHTML=`<div class="invoice-copy"><div class="copy-label">SHOP COPY</div>${copy}</div><div class="invoice-copy"><div class="copy-label">CUSTOMER COPY</div>${copy}</div>`}
+function printInvoice(id){let s=db.sales.find(x=>x.id===id);if(!s)return;makeInvoice(s);document.querySelectorAll('.section').forEach(x=>x.classList.remove('active'));$('invoicePrint').classList.add('active');window.print();setTimeout(()=>showTab('sales'),500)}
+function calcPurchase(){let qty=+$('purchaseQty').value||0,price=+$('purchasePrice').value||0;$('purchaseTotal').textContent=money(qty*price)}
+['purchaseQty','purchasePrice'].forEach(id=>$(id).addEventListener('input',calcPurchase));
+function resetPurchase(){$('purchaseSupplier').value='';$('purchaseItem').value='';$('purchaseQty').value=1;$('purchasePrice').value=0;$('purchaseMethod').value='Cash';$('purchaseNote').value='';$('purchaseDate').value=today();calcPurchase()}
+function savePurchase(){let item=$('purchaseItem').value.trim(),qty=+$('purchaseQty').value||0,price=+$('purchasePrice').value||0;if(!item)return alert('Please enter the purchased item.');if(qty<=0||price<=0)return alert('Enter a quantity and unit cost greater than zero.');db.purchases.unshift({id:Date.now(),date:$('purchaseDate').value||today(),supplier:$('purchaseSupplier').value.trim(),item,qty,price,total:qty*price,method:$('purchaseMethod').value,note:$('purchaseNote').value.trim()});persist();resetPurchase()}
+function renderPurchases(){$('purchasesTable').innerHTML=db.purchases.length?`<table><thead><tr><th>Date</th><th>Supplier</th><th>Item / Raw Material</th><th>Quantity</th><th>Unit Cost</th><th>Total</th><th>Payment</th><th>Reference</th><th></th></tr></thead><tbody>${db.purchases.map(p=>`<tr><td>${esc(p.date)}</td><td>${esc(p.supplier||'—')}</td><td>${esc(p.item)}</td><td>${esc(p.qty)}</td><td>${money(p.price)}</td><td>${money(p.total)}</td><td>${esc(p.method)}</td><td>${esc(p.note||'—')}</td><td><button class="danger" onclick="deletePurchase(${p.id})">Delete</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No purchases recorded yet.</div>'}
+function deletePurchase(id){if(confirm('Delete this purchase?')){db.purchases=db.purchases.filter(p=>p.id!==id);persist()}}
+function saveExpense(){let amount=+$('expAmount').value||0;if(amount<=0)return alert('Enter an amount greater than zero.');db.expenses.unshift({id:Date.now(),date:$('expDate').value||today(),type:$('expType').value,amount,note:$('expNote').value.trim()});persist();$('expAmount').value=0;$('expNote').value=''}
+function renderExpenses(){$('expensesTable').innerHTML=db.expenses.length?`<table><thead><tr><th>Date</th><th>Type</th><th>Reference</th><th>Amount</th><th></th></tr></thead><tbody>${db.expenses.map(e=>`<tr><td>${esc(e.date)}</td><td>${esc(e.type)}</td><td>${esc(e.note)}</td><td>${money(e.amount)}</td><td><button class="danger" onclick="deleteExpense(${e.id})">Delete</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No expenses recorded yet.</div>'}
+function deleteExpense(id){if(confirm('Delete this expense?')){db.expenses=db.expenses.filter(x=>x.id!==id);persist()}}
+function renderDashboard(){let from=$('dashFrom').value,to=$('dashTo').value;let invoiceFilter=$('invoiceFilter').value;$('salesInvoicePanel').classList.toggle('hidden',invoiceFilter!=='sales');$('purchaseInvoicePanel').classList.toggle('hidden',invoiceFilter!=='purchases');let inRange=date=>(!from||date>=from)&&(!to||date<=to);let sales=db.sales.filter(s=>inRange(s.date)),purchaseList=db.purchases.filter(p=>inRange(p.date)),expenses=db.expenses.filter(e=>inRange(e.date)),purchases=purchaseList.reduce((a,p)=>a+(Number(p.total)||0),0)+expenses.filter(e=>e.type==='Raw Material').reduce((a,e)=>a+e.amount,0),otherExpenses=expenses.filter(e=>e.type!=='Raw Material').reduce((a,e)=>a+e.amount,0),grossProfit=sales.reduce((a,s)=>a+(Number(s.profit)||0),0),salesTotal=sales.reduce((a,s)=>a+(Number(s.total)||0),0),due=db.sales.reduce((a,s)=>a+(Number(s.balance)||0),0);$('dashSales').textContent=money(salesTotal);$('dashPurchases').textContent=money(purchases);$('dashExpenses').textContent=money(otherExpenses);$('dashNetProfit').textContent=money(grossProfit-otherExpenses);$('balanceDue').textContent=money(due);$('salesInvoices').innerHTML=sales.length?`<table><thead><tr><th>Invoice No.</th><th>Date</th><th>Customer</th><th>Total</th><th>Balance</th><th></th></tr></thead><tbody>${sales.map(s=>`<tr><td>${esc(s.invoice||'—')}</td><td>${esc(s.date)}</td><td>${esc(s.customer)}</td><td>${money(s.total)}</td><td>${money(s.balance)}</td><td><button onclick="printInvoice(${s.id})">Print</button></td></tr>`).join('')}</tbody></table>`:'<div class="empty">No sales invoices in this date range.</div>';$('purchaseInvoices').innerHTML=purchaseList.length?`<table><thead><tr><th>Date</th><th>Supplier</th><th>Item / Raw Material</th><th>Quantity</th><th>Total</th><th>Payment</th></tr></thead><tbody>${purchaseList.map(p=>`<tr><td>${esc(p.date)}</td><td>${esc(p.supplier||'—')}</td><td>${esc(p.item)}</td><td>${esc(p.qty)}</td><td>${money(p.total)}</td><td>${esc(p.method||'—')}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">No purchase invoices in this date range.</div>'}
+function clearDashboardDates(){$('dashFrom').value='';$('dashTo').value='';renderDashboard()}
+function renderAll(){renderPurchases();renderExpenses();renderDashboard();$('setName').value=db.settings.name;$('setPhone').value=db.settings.phone;$('setAddress').value=db.settings.address;$('setFooter').value=db.settings.footer}
+function saveSettings(){db.settings={name:$('setName').value.trim()||db.settings.name,phone:$('setPhone').value.trim(),address:$('setAddress').value.trim(),footer:$('setFooter').value.trim()};persist();alert('Settings saved.')}
+function backupData(){let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MO-Traders-POS-Backup-'+today()+'.json';a.click();URL.revokeObjectURL(a.href)}
+function restoreData(ev){let f=ev.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x.sales||!x.expenses)throw Error();if(!confirm('Restore backup and replace current data?'))return;db={...db,...x,purchases:Array.isArray(x.purchases)?x.purchases:[],settings:{...db.settings,...x.settings}};delete db.inventory;persist();alert('Backup restored.')}catch(e){alert('Invalid backup file.')}ev.target.value=''};r.readAsText(f)}
+function clearAll(){if(confirm('This permanently clears POS records in this browser and Firebase (if signed in). Export a backup first. Continue?')){localStorage.removeItem(KEY);if(cloudReady&&cloudDoc){cloudReady=false;if(stopCloudListener)stopCloudListener();cloudDoc.delete().then(()=>location.reload()).catch(e=>alert(`Could not clear Firebase data: ${e.message}`))}else location.reload()}}
+load();$('saleDate').value=today();$('expDate').value=today();$('purchaseDate').value=today();$('invoiceNo').value=nextInvoice();calcSale();calcPurchase();renderAll();initializeFirebase();
+</script>
+</body></html>
